@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
-from app.crud.programas import update_url_pdf
+from app.crud.programas import get_programa_by_code, update_url_pdf
 from app.utils.utils import save_uploaded_document
 from core.database import get_db
 from sqlalchemy.orm import Session
@@ -27,6 +27,16 @@ def upload_document(
     Sube un archivo PDF, Word o Excel al servidor y devuelve su ruta de almacenamiento.
     """
     try:
+
+
+        programa = get_programa_by_code(db, codigo)
+
+        if programa is None:
+            raise HTTPException(status_code=404, detail="Programa no encontrado")
+
+
+
+
         file_path = save_uploaded_document(file)
 
 

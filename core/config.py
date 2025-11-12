@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     DB_NAME: str = os.getenv("DB_NAME", "")
 
 
-    UPLOAD_DOCS: str =os.getenv("UPLOAD_DOCS")
+    UPLOAD_DOCS: str = os.getenv("UPLOAD_DOCS")
 
     DATABASE_URL: str = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
     
