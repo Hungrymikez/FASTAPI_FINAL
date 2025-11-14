@@ -19,10 +19,6 @@ def upload_document(
     ):
 
 
-
-
-
-
     """
     Sube un archivo PDF, Word o Excel al servidor y devuelve su ruta de almacenamiento.
     """
@@ -54,3 +50,8 @@ def upload_document(
     except Exception as e:
         # Captura cualquier otro error inesperado
         raise HTTPException(status_code=500, detail=f"Error interno: {str(e)}")
+
+
+
+
+
