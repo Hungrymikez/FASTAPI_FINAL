@@ -29,7 +29,7 @@ from jose import JWTError, jwt
 from core.config import settings
 
 # Configurar hashing de contraseñas
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
 # Función para generar un hashed_password
 def get_hashed_password(password: str):
