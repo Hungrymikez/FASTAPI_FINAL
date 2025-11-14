@@ -1,4 +1,5 @@
 
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.schemas.usuarios import CrearUsuario, EditarPass, Editar_usuario, RetornoUsuario
