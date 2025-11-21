@@ -33,3 +33,10 @@ class EditarPass(BaseModel): #BaseModel es de pydantic
     # contra_encript: str = Field(min_length=8)
     contra_anterior: str = Field(min_length=8)
     contra_nueva: str = Field(min_length=8)
+
+
+#ESTO ES NUEVO
+class Crear_usuario_caleto(UsuarioBase):
+    contra_encript: str = Field(min_length=8)
+    estado: bool = True
+    

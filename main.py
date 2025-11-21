@@ -12,10 +12,10 @@ app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Incluir en el objeto app los routers
-app.include_router(usuarios.router, prefix="/usuario", tags=["servicios usuarios"])
-app.include_router(centros.router, prefix="/centro", tags=["servicios de Centros de Formación"])
-app.include_router(auth.router, prefix="/access", tags=["servicios de login"])
-app.include_router(cargar_archivos.router, prefix="/cargar", tags=["servicios de upload"])
+app.include_router(usuarios.router, prefix="/usuario", tags=["Servicios usuarios"])
+app.include_router(centros.router, prefix="/centro", tags=["Servicios de Centros de Formación"])
+app.include_router(auth.router, prefix="/access", tags=["Servicios de login"])
+app.include_router(cargar_archivos.router, prefix="/cargar", tags=["Servicios de upload"])
 app.include_router(programas.router)
 
 # Configuración de CORS para permitir todas las solicitudes desde cualquier origen

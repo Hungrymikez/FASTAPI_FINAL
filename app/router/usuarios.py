@@ -2,13 +2,39 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from app.schemas.usuarios import CrearUsuario, EditarPass, Editar_usuario, RetornoUsuario
+from app.schemas.usuarios import CrearUsuario, EditarPass, Editar_usuario, RetornoUsuario, Crear_usuario_caleto
 from core.database import get_db
 from app.crud import usuarios as crud_users
 
 from sqlalchemy.exc import SQLAlchemyError
 from app.router.dependencies import get_current_user
 router = APIRouter()
+
+
+            #NUEVA RUTA PARA ENSAYAR
+@router.post("/registrar_caleto", status_code=status.HTTP_201_CREATED)#DECORADOR
+def create_user(
+    user: Crear_usuario_caleto, 
+    db: Session = Depends(get_db),
+    #user_token: RetornoUsuario = Depends(get_current_user)
+
+):
+    #print(user_token)
+    try:
+        # if user_token.id_rol != 1:
+        #         # raise HTTPException(status_code=500, detail="No tienes permisos")
+        #         raise HTTPException(status_code=403, detail="No tienes permisos")
+        crud_users.create_user(db, user)
+        return {"message": "Usuario caleto creado correctamente"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+
+
+
+
+
 
 @router.post("/registrar", status_code=status.HTTP_201_CREATED)#DECORADOR
 def create_user(
@@ -166,3 +192,8 @@ def get_all_s(
         return users
     except SQLAlchemyError as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+
+
+
+

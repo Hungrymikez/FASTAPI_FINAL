@@ -6,10 +6,13 @@ import logging
 
 from sqlalchemy.exc import SQLAlchemyError
 
-from app.schemas.usuarios import CrearUsuario, EditarPass, Editar_usuario, RetornoUsuario
+from app.schemas.usuarios import CrearUsuario, EditarPass, Editar_usuario, RetornoUsuario, Crear_usuario_caleto
 from core.security import get_hashed_password, verify_password
 
 logger = logging.getLogger(__name__)
+
+
+
 
 def create_user(db: Session, user: CrearUsuario) -> Optional[bool]:
     try: #AQUI VA EL SQL
@@ -50,6 +53,53 @@ def create_user(db: Session, user: CrearUsuario) -> Optional[bool]:
         db.rollback()
         logger.error(f"Error al crear usuario: {e}")
         raise Exception("Error de base de datos al crear el usuario")
+
+
+def create_user_caleto(db: Session, user: Crear_usuario_caleto) -> Optional[bool]:
+    try: #AQUI VA EL SQL
+        # dataUser = user.model_dump()
+        # contra_original = dataUser["contra_encript"]
+        # print(contra_original)
+
+        # contra_encriptada = get_hashed_password(contra_original)
+        # print(contra_encriptada)
+
+        dataUser = user.model_dump()
+        
+        contra_original = dataUser["contra_encript"]
+        
+        contra_encriptada = get_hashed_password(contra_original)
+
+        dataUser["contra_encript"] = contra_encriptada
+
+
+
+
+
+        query = text(""" 
+            INSERT INTO usuario (
+                nombre_completo, num_documento, 
+                correo, contra_encript, id_rol,
+                estado
+            ) VALUES (
+                :nombre_completo, :num_documento,
+                :correo, :contra_encript, :id_rol,
+                :estado
+            )
+        """)
+        db.execute(query, dataUser)
+        db.commit()
+        return True
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Error al crear usuario caleto: {e}")
+        raise Exception("Error de base de datos al crear el usuario caleto socio")
+
+
+
+
+
+
 
 
 
