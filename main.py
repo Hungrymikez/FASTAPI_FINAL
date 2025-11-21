@@ -6,6 +6,8 @@ from app.router import centros
 from app.router import auth
 from app.router import cargar_archivos
 from app.router import programas
+from app.router import cargar_archivo_pepeganga
+from app.router import cargar_archivo_pepeganga_seguro
 
 app = FastAPI()
 
@@ -17,6 +19,10 @@ app.include_router(centros.router, prefix="/centro", tags=["Servicios de Centros
 app.include_router(auth.router, prefix="/access", tags=["Servicios de login"])
 app.include_router(cargar_archivos.router, prefix="/cargar", tags=["Servicios de upload"])
 app.include_router(programas.router)
+
+
+app.include_router(cargar_archivo_pepeganga.router, prefix="/cargar_pepeganga", tags=["PEPEGANGA"])
+app.include_router(cargar_archivo_pepeganga_seguro.router, prefix="/cargar_pepeganga_seguro", tags=["PEPEGANGA"])
 
 # Configuración de CORS para permitir todas las solicitudes desde cualquier origen
 app.add_middleware(
