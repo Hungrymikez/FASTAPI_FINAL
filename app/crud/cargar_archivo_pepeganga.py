@@ -7,6 +7,9 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
+
+
 def insertar_datos_en_bd(db: Session, df_proyectos):
     db.execute(text("TRUNCATE TABLE proyectos_innovacion"))
     registros_insertados = 0
@@ -41,7 +44,6 @@ def insertar_datos_en_bd(db: Session, df_proyectos):
     for idx, row in df_proyectos.iterrows():
         try:
             row_dict = row.to_dict()
-            # Limpiar valores NaN → None (SQL null)
             row_dict = {k: (None if pd.isna(v) else v) for k, v in row_dict.items()}
             db.execute(insert_sql, row_dict)
             registros_insertados += 1
@@ -49,12 +51,16 @@ def insertar_datos_en_bd(db: Session, df_proyectos):
             msg = f"Error al insertar proyecto (índice {idx}): {e}"
             errores.append(msg)
             logger.error(msg)
-            db.rollback()  # opcional, si quieres detener todo
+            db.rollback()
 
     db.commit()
+
+    # 👇 Devuelve también una vista previa (máx. 100 filas) como lista de dict
+    preview = df_proyectos.head(100).fillna("").to_dict(orient="records")
 
     return {
         "registros_insertados": registros_insertados,
         "errores": errores,
-        "mensaje": "Carga completada con errores" if errores else "CARGA COMPLETADA EXITOSAMENTE MI SOCIO"
+        "mensaje": "Carga completada con errores" if errores else "Carga completada exitosamente",
+        "datos": preview  # 👈 esto es nuevo
     }

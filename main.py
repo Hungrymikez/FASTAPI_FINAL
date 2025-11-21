@@ -25,6 +25,14 @@ app.include_router(cargar_archivo_pepeganga.router, prefix="/cargar_pepeganga", 
 app.include_router(cargar_archivo_pepeganga_seguro.router, prefix="/cargar_pepeganga_seguro", tags=["PEPEGANGA"])
 
 # Configuración de CORS para permitir todas las solicitudes desde cualquier origen
+
+origins = [
+    "http://127.0.0.1:5501",  # Si usas Live Server en VS Code
+    "http://localhost:5500",
+    "https://fastapifinal-production.up.railway.app", # Si ya está en producción
+]
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Permitir solicitudes desde cualquier origen
