@@ -1,27 +1,3 @@
-# from passlib.context import CryptContext
-
-
-# # Configurar hashing de contraseñas
-
-# #ESTO ES PARA BCRYPT
-# # pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-# pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
-
-
-
-# # Función para generar un hashed_password
-# def get_hashed_password(password: str):
-#     return pwd_context.hash(password)
-
-
-
-
-# #funcion para verificar una contraseña hasheada
-
-# def verify_password(plain_password: str, hashed_password: str):
-#     return pwd_context.verify(plain_password, hashed_password)
-
 
 from passlib.context import CryptContext
 from datetime import datetime, timedelta, timezone

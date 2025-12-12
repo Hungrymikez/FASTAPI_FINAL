@@ -1,0 +1,161 @@
+-- Base de datos para el proyecto
+DROP DATABASE IF EXISTS MODULO_INNOVACION;
+CREATE DATABASE MODULO_INNOVACION CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+USE MODULO_INNOVACION;
+
+-- Tabla de roles
+CREATE TABLE rol(
+    id_rol SMALLINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    nombre_rol VARCHAR(20)
+);
+
+-- Tabla de usuarios
+CREATE TABLE usuario(
+    id_usuario INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    nombre_completo VARCHAR(80),
+    num_documento CHAR(12),
+    correo VARCHAR(100) UNIQUE,
+    contra_encript VARCHAR(140),
+    id_rol SMALLINT UNSIGNED,
+    estado BOOLEAN,  -- True = 1 Activo   False = 0 Inactivo
+    FOREIGN KEY (id_rol) REFERENCES rol(id_rol)
+);
+
+-- Tabla de proyectos
+CREATE TABLE IF NOT EXISTS `proyectos` (
+	`id` INTEGER NOT NULL AUTO_INCREMENT UNIQUE,
+	`nombre` VARCHAR(255) NOT NULL,
+	PRIMARY KEY(`id`)
+);
+
+-- Índice para proyectos
+CREATE INDEX `projects_index_0` ON `proyectos` (`id`);
+
+-- Tabla de archivos
+CREATE TABLE IF NOT EXISTS `archivos` (
+	`id` BIGINT NOT NULL AUTO_INCREMENT UNIQUE,
+	`id_proyecto` INTEGER NOT NULL,
+	`nombre_archivo` VARCHAR(255) NOT NULL,
+	`ruta_almacenamiento` VARCHAR(255) NOT NULL,
+	`fecha_carga` DATE NOT NULL,
+	`fecha_informe` DATE NOT NULL,
+	`responsable` VARCHAR(255) NOT NULL,
+	`progreso` INTEGER NOT NULL,
+	`observacion` TEXT(255),
+	`tamano_archivo` VARCHAR(50) NOT NULL,
+	`version` VARCHAR(50) NOT NULL,
+	`categoria` VARCHAR(100) NOT NULL,
+	`codigo_sgps` VARCHAR(100),
+	`nombre_centro` VARCHAR(255),
+	`regional` VARCHAR(100),
+	`responsables_proyecto` TEXT(255),
+	`es_modificado` BOOLEAN DEFAULT FALSE,
+	PRIMARY KEY(`id`)
+);
+
+-- Tabla de archivos modificados
+CREATE TABLE IF NOT EXISTS `archivos_modificados` (
+	`id` BIGINT NOT NULL AUTO_INCREMENT UNIQUE,
+	`id_archivo_original` BIGINT NOT NULL,
+	`id_proyecto` INTEGER NOT NULL,
+	`nombre_archivo` VARCHAR(255) NOT NULL,
+	`ruta_almacenamiento` VARCHAR(255) NOT NULL,
+	`fecha_subido` DATE NOT NULL,
+	`fecha_informe` DATE NOT NULL,
+	`responsable` VARCHAR(255) NOT NULL,
+	`progreso` INTEGER NOT NULL,
+	`observacion` TEXT(255),
+	`tamano_archivo` VARCHAR(50) NOT NULL,
+	`version` VARCHAR(50) NOT NULL,
+	`categoria` VARCHAR(100) NOT NULL,
+	`codigo_sgps` VARCHAR(100),
+	`nombre_centro` VARCHAR(255),
+	`regional` VARCHAR(100),
+	`responsables_proyecto` TEXT(255),
+	`razon_modificado` TEXT(255),
+	PRIMARY KEY(`id`)
+);
+
+-- Foreign Keys (corregidas - las originales estaban invertidas)
+-- Relación: archivos.id_proyecto -> proyectos.id
+ALTER TABLE `archivos`
+ADD FOREIGN KEY(`id_proyecto`) REFERENCES `proyectos`(`id`)
+ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Relación: archivos_modificados.id_archivo_original -> archivos.id
+ALTER TABLE `archivos_modificados`
+ADD FOREIGN KEY(`id_archivo_original`) REFERENCES `archivos`(`id`)
+ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Relación: archivos_modificados.id_proyecto -> proyectos.id
+ALTER TABLE `archivos_modificados`
+ADD FOREIGN KEY(`id_proyecto`) REFERENCES `proyectos`(`id`)
+ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Tablas adicionales del sistema anterior (mantenidas para compatibilidad)
+CREATE TABLE IF NOT EXISTS `centros_formacion` (
+	`cod_centro` SMALLINT UNSIGNED NOT NULL UNIQUE,
+	`nombre_centro` VARCHAR(160),
+	`cod_regional` TINYINT UNSIGNED,
+	`nombre_regional` VARCHAR(80),
+	PRIMARY KEY(`cod_centro`)
+);
+
+CREATE TABLE IF NOT EXISTS `municipios` (
+	`cod_municipio` CHAR(5) NOT NULL UNIQUE,
+	`nombre` VARCHAR(80),
+	PRIMARY KEY(`cod_municipio`)
+);
+
+CREATE TABLE IF NOT EXISTS `estrategia` (
+	`cod_estrategia` CHAR(5) NOT NULL UNIQUE,
+	`nombre` VARCHAR(80),
+	PRIMARY KEY(`cod_estrategia`)
+);
+
+CREATE TABLE IF NOT EXISTS `programas_formacion` (
+	`cod_programa` MEDIUMINT UNSIGNED NOT NULL UNIQUE,
+	`version` CHAR(4),
+	`nombre` VARCHAR(200),
+	`nivel` VARCHAR(70),
+	`id_red` INTEGER UNSIGNED,
+	`tiempo_duracion` SMALLINT UNSIGNED,
+	`unidad_medida` VARCHAR(50),
+	`estado` BOOLEAN,
+	`url_pdf` VARCHAR(180),
+	PRIMARY KEY(`cod_programa`)
+);
+
+CREATE TABLE IF NOT EXISTS `grupos` (
+	`ficha` INTEGER UNSIGNED NOT NULL UNIQUE,
+	`cod_programa` MEDIUMINT UNSIGNED,
+	`cod_centro` SMALLINT UNSIGNED,
+	`modalidad` VARCHAR(80),
+	`jornada` VARCHAR(80),
+	`etapa_ficha` VARCHAR(80),
+	`estado_curso` VARCHAR(80),
+	`fecha_inicio` DATE,
+	`fecha_fin` DATE,
+	`cod_municipio` CHAR(5),
+	`cod_estrategia` CHAR(5),
+	`nombre_responsable` VARCHAR(150),
+	`cupo_asignado` SMALLINT UNSIGNED,
+	`num_aprendices_fem` SMALLINT UNSIGNED,
+	`num_aprendices_mas` SMALLINT UNSIGNED,
+	`num_aprendices_nobin` SMALLINT UNSIGNED,
+	`num_aprendices_matriculados` SMALLINT UNSIGNED,
+	`num_aprendices_activos` SMALLINT UNSIGNED,
+	`tipo_doc_empresa` CHAR(5),
+	`num_doc_empresa` VARCHAR(30),
+	`nombre_empresa` VARCHAR(140),
+	PRIMARY KEY(`ficha`),
+    FOREIGN KEY(`cod_programa`) REFERENCES `programas_formacion`(`cod_programa`)
+    ON UPDATE NO ACTION ON DELETE NO ACTION,
+    FOREIGN KEY(`cod_centro`) REFERENCES `centros_formacion`(`cod_centro`)
+    ON UPDATE NO ACTION ON DELETE NO ACTION,
+    FOREIGN KEY(`cod_municipio`) REFERENCES `municipios`(`cod_municipio`)
+    ON UPDATE NO ACTION ON DELETE NO ACTION,
+    FOREIGN KEY(`cod_estrategia`) REFERENCES `estrategia`(`cod_estrategia`)
+    ON UPDATE NO ACTION ON DELETE NO ACTION
+);
