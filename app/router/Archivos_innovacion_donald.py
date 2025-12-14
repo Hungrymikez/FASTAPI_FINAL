@@ -11,7 +11,7 @@ from app.router.dependencies import get_current_user
 # Importamos la conexión a la base de datos y los esquemas (el menú)
 from app.schemas.usuarios import RetornoUsuario
 from core.database import get_db
-from app.crud.Archivos_innovacion import obtener_ultima_version_archivo
+from app.crud.Archivos_innovacion_donald import obtener_ultima_version_archivo
 
 from app.schemas.Archivos_innovacion import (
     ArchivoResponse, ListaArchivosResponse, ArchivoMetaResponse
