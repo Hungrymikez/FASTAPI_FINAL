@@ -5,7 +5,7 @@ from fastapi import APIRouter, UploadFile, File, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import Optional, List
 from datetime import datetime
-from app.crud.Archivos_innovacion import obtener_estadisticas_archivos
+from app.crud.Archivos_innovacion_donald import obtener_estadisticas_archivos
 
 from app.router.dependencies import get_current_user
 # Importamos la conexión a la base de datos y los esquemas (el menú)
