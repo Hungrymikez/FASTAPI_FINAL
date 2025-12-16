@@ -17,7 +17,7 @@ from app.schemas.Archivos_innovacion import (
     ArchivoResponse, ListaArchivosResponse, ArchivoMetaResponse
 )
 # Importamos las funciones de la cocina (CRUD) DONALD
-from app.crud.Archivos_innovacion import (
+from app.crud.Archivos_innovacion_donald import (
     eliminar_todos_los_archivos_permanente, listar_archivos, obtener_meta_archivo,
     insertar_archivo, insertar_archivo_modificado, eliminar_archivo,
     obtener_ultima_version_para_proyecto, listar_proyectos, versiones_por_original
@@ -35,7 +35,6 @@ os.makedirs(DIRECTORIO_SUBIDAS, exist_ok=True)
 # def calcular_siguiente_version(version_actual_texto: Optional[str]) -> str:
 #     if not version_actual_texto:
 #         return "v1.0"
-    
 #     # Usamos Regex para buscar el patrón "vNumero.Numero" (Ej: v1.5)
 #     coincidencia_regex = re.match(r"v(\d+)\.(\d+)", version_actual_texto)
     
@@ -76,7 +75,7 @@ def formatear_fila_para_respuesta(fila_base_datos, mapa_nombres_proyectos, es_mo
         return None
         
     id_del_proyecto = fila_base_datos.get("id_proyecto")
-    nombre_del_proyecto = mapa_nombres_proyectos.get(id_del_proyecto)
+    nombre_del_proyecto = mapa_nombres_proyectos.get(id_del_proyecto) #AQUI SUELTA EL TIPO DE PROYECTO QUE ES OSEA LA CATEGORIA ES RARO
     
     # Función interna para convertir fechas a texto (evita el error 500)
     def convertir_fecha_a_texto(objeto_fecha):
@@ -89,8 +88,7 @@ def formatear_fila_para_respuesta(fila_base_datos, mapa_nombres_proyectos, es_mo
     # Construimos el diccionario final
     return {
         "id": fila_base_datos.get("id"),
-        "id_proyecto": id_del_proyecto,
-        "nombre_proyecto": nombre_del_proyecto, #MODIFIQUE AQUI
+        "nombre_proyecto": fila_base_datos.get("nombre_proyecto"), #MODIFIQUE AQUI
         "nombre_archivo": fila_base_datos.get("nombre_archivo"),
         # Aplicamos la conversión de fechas aquí
         "fecha_carga": convertir_fecha_a_texto(fila_base_datos.get("fecha_carga")), 
@@ -101,7 +99,8 @@ def formatear_fila_para_respuesta(fila_base_datos, mapa_nombres_proyectos, es_mo
         "observacion": fila_base_datos.get("observacion"),
         "tamano_archivo": fila_base_datos.get("tamano_archivo"),
         "version": fila_base_datos.get("version"),
-        "categoria": fila_base_datos.get("categoria"),
+        "id_proyecto": id_del_proyecto,
+        "categoria": nombre_del_proyecto,  #AQUI SUELTA EL TIPO DE PROYECTO QUE ES OSEA LA CATEGORIA ES RARO VA DESDE ARRIBA QUE TIENE ESTE MISMO MENSAJE
         "codigo_sgps": fila_base_datos.get("codigo_sgps"),
         "nombre_centro": fila_base_datos.get("nombre_centro"),
         "regional": fila_base_datos.get("regional"),
@@ -116,7 +115,7 @@ def formatear_fila_para_respuesta(fila_base_datos, mapa_nombres_proyectos, es_mo
 # --- RUTA 1: LISTAR ARCHIVOS (GET /) --- 
 @router.get("/", response_model=ListaArchivosResponse)
 def get_archivos(
-    texto_busqueda: Optional[str] = Query(None, alias="q"), # 'q' en URL, 'texto_busqueda' en Python
+    texto_busqueda: Optional[str] = Query(None, alias="query"), # 'q' en URL, AQUI MODIFIQUÉ 'texto_busqueda' en Python
     id_proyecto: Optional[int] = Query(None),
     fechaDesde: Optional[str] = Query(None),
     fechaHasta: Optional[str] = Query(None),
@@ -223,6 +222,7 @@ def meta_archivo(
 @router.post("/upload")
 def upload_file(
     file: UploadFile = File(...),
+    nombre_proyecto: Optional[str] = Query(None), #AQUI MODIFIQUE
     id_proyecto: int = Query(...),
     fecha_informe: Optional[str] = Query(None),
     responsable: Optional[str] = Query(None),
@@ -272,58 +272,13 @@ def upload_file(
         raise HTTPException(status_code=500, detail=f"Error al guardar el archivo en disco: {error_disco}")
 
 
-    # PASO 3: GUARDADO EN BASE DE DATOS
-    # try:
-    #     # Calcular cuál es la versión siguiente (v1.0 -> v1.1)
-    #     ultima_version_existente = obtener_ultima_version_para_proyecto(db, id_proyecto)
-    #     nueva_version = calcular_siguiente_version(ultima_version_existente)
-        
-    #     datos_para_insertar = {
-    #         "id_proyecto": id_proyecto,
-    #         "nombre_archivo": nombre_archivo_original, # Nombre bonito para el usuario
-    #         "ruta_almacenamiento": nombre_unico_disco, # Nombre técnico para el servidor
-    #         "fecha_informe": fecha_informe,
-    #         "responsable": responsable,
-    #         "progreso": progreso,
-    #         "observacion": observacion or "",
-    #         "tamano_archivo": tamano_str,
-    #         "version": nueva_version,
-    #         "categoria": categoria,
-    #         "codigo_sgps": codigo_sgps or "",
-    #         "nombre_centro": nombre_centro or "",
-    #         "regional": regional or "",
-    #         "responsables_proyecto": responsables_proyecto or ""
-    #     }
-        
-    #     fecha_registro_hoy = fecha_actual.strftime("%Y-%m-%d")
-
-    #     if is_modificacion and id_archivo_original:
-    #         # Es una modificación
-    #         datos_para_insertar.update({
-    #             "id_archivo_original": id_archivo_original,
-    #             "fecha_subido": fecha_registro_hoy,
-    #             "razon_modificado": razon_modificado or ""
-    #         })
-    #         nuevo_id = insertar_archivo_modificado(db, datos_para_insertar)
-    #         return {"id": nuevo_id, "is_modificado": True, "version": nueva_version}
-    #     else:
-    #         # Es un archivo original nuevo
-    #         datos_para_insertar.update({"fecha_carga": fecha_registro_hoy})
-    #         nuevo_id = insertar_archivo(db, datos_para_insertar)
-    #         return {"id": nuevo_id, "is_modificado": False, "version": nueva_version}
-            
-    # except Exception as error_db:
-    #     # Si falla la DB, borramos el archivo del disco para no dejar basura
-    #     try:
-    #         os.remove(ruta_completa_guardado)
-    #     except Exception:
-    #         pass
-    #     raise HTTPException(status_code=500, detail=str(error_db))
+    
 
     # PASO 3: GUARDADO EN BASE DE DATOS
     try:
         datos_para_insertar = {
             "id_proyecto": id_proyecto,
+            "nombre_proyecto": nombre_proyecto,
             "nombre_archivo": nombre_archivo_original,
             "ruta_almacenamiento": nombre_unico_disco,
             "fecha_informe": fecha_informe,
@@ -372,6 +327,56 @@ def upload_file(
         except Exception:
             pass
         raise HTTPException(status_code=500, detail=str(error_db))
+    
+
+
+    # PASO 3: GUARDADO EN BASE DE DATOS  ES LA FUNNCION DE ARRIBA
+    # try:
+    #     # Calcular cuál es la versión siguiente (v1.0 -> v1.1)
+    #     ultima_version_existente = obtener_ultima_version_para_proyecto(db, id_proyecto)
+    #     nueva_version = calcular_siguiente_version(ultima_version_existente)
+        
+    #     datos_para_insertar = {
+    #         "id_proyecto": id_proyecto,
+    #         "nombre_archivo": nombre_archivo_original, # Nombre bonito para el usuario
+    #         "ruta_almacenamiento": nombre_unico_disco, # Nombre técnico para el servidor
+    #         "fecha_informe": fecha_informe,
+    #         "responsable": responsable,
+    #         "progreso": progreso,
+    #         "observacion": observacion or "",
+    #         "tamano_archivo": tamano_str,
+    #         "version": nueva_version,
+    #         "categoria": categoria,
+    #         "codigo_sgps": codigo_sgps or "",
+    #         "nombre_centro": nombre_centro or "",
+    #         "regional": regional or "",
+    #         "responsables_proyecto": responsables_proyecto or ""
+    #     }
+        
+    #     fecha_registro_hoy = fecha_actual.strftime("%Y-%m-%d")
+
+    #     if is_modificacion and id_archivo_original:
+    #         # Es una modificación
+    #         datos_para_insertar.update({
+    #             "id_archivo_original": id_archivo_original,
+    #             "fecha_subido": fecha_registro_hoy,
+    #             "razon_modificado": razon_modificado or ""
+    #         })
+    #         nuevo_id = insertar_archivo_modificado(db, datos_para_insertar)
+    #         return {"id": nuevo_id, "is_modificado": True, "version": nueva_version}
+    #     else:
+    #         # Es un archivo original nuevo
+    #         datos_para_insertar.update({"fecha_carga": fecha_registro_hoy})
+    #         nuevo_id = insertar_archivo(db, datos_para_insertar)
+    #         return {"id": nuevo_id, "is_modificado": False, "version": nueva_version}
+            
+    # except Exception as error_db:
+    #     # Si falla la DB, borramos el archivo del disco para no dejar basura
+    #     try:
+    #         os.remove(ruta_completa_guardado)
+    #     except Exception:
+    #         pass
+    #     raise HTTPException(status_code=500, detail=str(error_db))
 
 
 

@@ -92,3 +92,8 @@ INSERT INTO rol (id_rol, nombre_rol) VALUES
 (1,'Administrador'),
 (2,'Editor'),
 (3,'Usuario');
+
+INSERT INTO tipo_proyecto (id,nombre) VALUES
+(1,'SALUD'),
+(2,'NARCOTICOS'),
+(3,'EDUCACION');

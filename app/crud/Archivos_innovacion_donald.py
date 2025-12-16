@@ -33,7 +33,7 @@ def eliminar_todos_los_archivos_permanente(db: Session):
 def listar_proyectos(db: Session):
     try:
         # Cambio: q -> consulta_proyectos
-        consulta_proyectos = text("SELECT id, nombre FROM proyectos ORDER BY nombre")
+        consulta_proyectos = text("SELECT id, nombre FROM tipo_proyecto ORDER BY nombre") #AQUI MODIFIQUE
         return db.execute(consulta_proyectos).mappings().all()
     except SQLAlchemyError as error_sql:
         logger.error(f"Error listar_proyectos: {error_sql}")
@@ -55,7 +55,7 @@ def listar_archivos(db: Session, filtros: dict):
         if q not in (None, "", "null", "undefined"):
             texto_busqueda = f"%{q}%"
             base_sql += (
-                " AND (nombre_archivo LIKE :q OR responsable LIKE :q OR observacion LIKE :q "
+                " AND (nombre_archivo LIKE :q OR nombre_proyecto LIKE :q OR responsable LIKE :q OR observacion LIKE :q "
                 "OR categoria LIKE :q OR codigo_sgps LIKE :q OR nombre_centro LIKE :q OR regional LIKE :q)"
             )
             parametros_sql["q"] = texto_busqueda
@@ -191,11 +191,11 @@ def insertar_archivo(db: Session, datos: dict):
         # Cambio: query -> consulta_insertar
         consulta_insertar = text("""
             INSERT INTO archivos (
-                id_proyecto, nombre_archivo, ruta_almacenamiento, fecha_carga,
+                id_proyecto, nombre_proyecto, nombre_archivo, ruta_almacenamiento, fecha_carga,
                 fecha_informe, responsable, progreso, observacion, tamano_archivo,
                 version, categoria, codigo_sgps, nombre_centro, regional, responsables_proyecto
             ) VALUES (
-                :id_proyecto, :nombre_archivo, :ruta_almacenamiento, :fecha_carga,
+                :id_proyecto, :nombre_proyecto,:nombre_archivo, :ruta_almacenamiento, :fecha_carga,
                 :fecha_informe, :responsable, :progreso, :observacion, :tamano_archivo,
                 :version, :categoria, :codigo_sgps, :nombre_centro, :regional, :responsables_proyecto
             )
@@ -215,12 +215,12 @@ def insertar_archivo_modificado(db: Session, datos: dict):
         # Cambio: query -> consulta_insertar_modificado
         consulta_insertar_modificado = text("""
             INSERT INTO archivos_modificados (
-                id_archivo_original, id_proyecto, nombre_archivo, ruta_almacenamiento,
+                id_archivo_original, id_proyecto, nombre_proyecto, nombre_archivo, ruta_almacenamiento,
                 fecha_subido, fecha_informe, responsable, progreso, observacion, tamano_archivo,
                 version, categoria, codigo_sgps, nombre_centro, regional, responsables_proyecto,
                 razon_modificado
             ) VALUES (
-                :id_archivo_original, :id_proyecto, :nombre_archivo, :ruta_almacenamiento,
+                :id_archivo_original, :id_proyecto, :nombre_proyecto, :nombre_archivo, :ruta_almacenamiento,
                 :fecha_subido, :fecha_informe, :responsable, :progreso, :observacion, :tamano_archivo,
                 :version, :categoria, :codigo_sgps, :nombre_centro, :regional, :responsables_proyecto,
                 :razon_modificado
