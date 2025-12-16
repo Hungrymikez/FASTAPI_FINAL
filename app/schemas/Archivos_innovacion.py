@@ -7,6 +7,7 @@ class ProyectoSimple(BaseModel):
 
 
 class ArchivoBase(BaseModel):
+    nombre_proyecto: Optional[str] = None
     id_proyecto: int
     fecha_informe: Optional[str] = None  # "YYYY-MM-DD"
     responsable: Optional[str] = None

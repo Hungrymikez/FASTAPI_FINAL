@@ -90,7 +90,7 @@ def formatear_fila_para_respuesta(fila_base_datos, mapa_nombres_proyectos, es_mo
     return {
         "id": fila_base_datos.get("id"),
         "id_proyecto": id_del_proyecto,
-        "nombre_proyecto": nombre_del_proyecto,
+        "nombre_proyecto": nombre_del_proyecto, #MODIFIQUE AQUI
         "nombre_archivo": fila_base_datos.get("nombre_archivo"),
         # Aplicamos la conversión de fechas aquí
         "fecha_carga": convertir_fecha_a_texto(fila_base_datos.get("fecha_carga")), 

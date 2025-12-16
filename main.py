@@ -69,7 +69,7 @@ app.include_router(Archivos_innovacion.router, prefix="/innovacion", tags=["SERV
 # Configuración de CORS para permitir todas las solicitudes desde cualquier origen
 
 
-app.include_router(Archivos_innovacion_donald.router, prefix="/innovacion_donald", tags=["SERVICIOS DE INNOVACION"])
+app.include_router(Archivos_innovacion_donald.router, prefix="/innovacion_donald", tags=["SERVICIOS DE INNOVACION DONALD"])
 origins = [
     "http://127.0.0.1:5501",  # Si usas Live Server en VS Code
     "http://127.0.0.1:5500", 
