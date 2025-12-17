@@ -484,6 +484,93 @@ def current_files(
     
     return {"archivos": archivos_ordenados}
 
+
+
+
+@router.get("/archivos_modificados", response_model=ListaArchivosResponse)
+def current_files(
+    limit: int = 20, 
+    fechaDesde: Optional[str] = None, 
+    fechaHasta: Optional[str] = None, 
+    db: Session = Depends(get_db), user_token: RetornoUsuario = Depends(get_current_user)
+):
+    filtros_modificados = {"tabla": "archivos_modificados", "fechaDesde": fechaDesde, "fechaHasta": fechaHasta}
+    
+
+    lista_modificados = listar_archivos(db, filtros_modificados)
+    
+    lista_proyectos = listar_proyectos(db)
+    mapa_nombres_proyectos = {proy["id"]: proy["nombre"] for proy in lista_proyectos}
+
+    todos_los_archivos = []
+    
+    # Procesamos modificados
+    for fila_mod in lista_modificados:
+        todos_los_archivos.append(formatear_fila_para_respuesta(fila_mod, mapa_nombres_proyectos, es_modificado=True))
+
+    # Función Lambda (Ahora con nombre claro) para ordenar
+    def obtener_fecha_para_ordenar(archivo_dict):
+        # Intenta usar fecha_subido, si no fecha_carga, si no una fecha muy vieja
+        return archivo_dict.get("fecha_subido") or archivo_dict.get("fecha_carga") or "1970-01-01"
+
+    # Ordenamos y cortamos la lista
+    archivos_ordenados = sorted(todos_los_archivos, key=obtener_fecha_para_ordenar, reverse=True)[:limit]
+    
+    return {"archivos": archivos_ordenados}
+
+
+
+
+
+@router.get("/archivos_originales", response_model=ListaArchivosResponse)
+def current_files(
+    limit: int = 20, 
+    fechaDesde: Optional[str] = None, 
+    fechaHasta: Optional[str] = None, 
+    db: Session = Depends(get_db), user_token: RetornoUsuario = Depends(get_current_user)
+):
+    filtros_originales = {"tabla": "archivos", "fechaDesde": fechaDesde, "fechaHasta": fechaHasta}
+    
+    lista_originales = listar_archivos(db, filtros_originales)
+    
+    lista_proyectos = listar_proyectos(db)
+    mapa_nombres_proyectos = {proy["id"]: proy["nombre"] for proy in lista_proyectos}
+
+    todos_los_archivos = []
+    
+    # Procesamos originales
+    for fila_orig in lista_originales:
+        todos_los_archivos.append(formatear_fila_para_respuesta(fila_orig, mapa_nombres_proyectos, es_modificado=False))
+        
+
+    # Función Lambda (Ahora con nombre claro) para ordenar
+    def obtener_fecha_para_ordenar(archivo_dict):
+        # Intenta usar fecha_subido, si no fecha_carga, si no una fecha muy vieja
+        return archivo_dict.get("fecha_subido") or archivo_dict.get("fecha_carga") or "1970-01-01"
+
+    # Ordenamos y cortamos la lista
+    archivos_ordenados = sorted(todos_los_archivos, key=obtener_fecha_para_ordenar, reverse=True)[:limit]
+    
+    return {"archivos": archivos_ordenados}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @router.get("/stats")
 def estadisticas_archivos(
     texto_busqueda: Optional[str] = Query(None, alias="q"),
