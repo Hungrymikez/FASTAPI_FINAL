@@ -43,8 +43,8 @@ def listar_proyectos(db: Session):
 
 def listar_archivos(db: Session, filtros: dict):
     tabla = filtros.get("tabla", "archivos")
-    fecha_columna = "fecha_carga" if tabla == "archivos" else "fecha_subido"
-    # fecha_columna = "fecha_informe" # Alternativa si se quiere filtrar por fecha_informe
+    # fecha_columna = "fecha_carga" if tabla == "archivos" else "fecha_subido"
+    fecha_columna = "fecha_informe" # Alternativa si se quiere filtrar por fecha_informe
 
     try:
         base_sql = f"SELECT * FROM {tabla} WHERE 1=1"
