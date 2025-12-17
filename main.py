@@ -63,13 +63,13 @@ app.include_router(programas.router)
 app.include_router(cargar_archivo_pepeganga.router, prefix="/cargar_pepeganga", tags=["PEPEGANGA"])
 app.include_router(cargar_archivo_pepeganga_seguro.router, prefix="/cargar_pepeganga_seguro", tags=["PEPEGANGA"])
 
+app.include_router(Archivos_innovacion_donald.router, prefix="/innovacion_donald", tags=["SERVICIOS DE INNOVACION DONALD"])
 
 
 app.include_router(Archivos_innovacion.router, prefix="/innovacion", tags=["SERVICIOS DE INNOVACION"])
 # Configuración de CORS para permitir todas las solicitudes desde cualquier origen
 
 
-app.include_router(Archivos_innovacion_donald.router, prefix="/innovacion_donald", tags=["SERVICIOS DE INNOVACION DONALD"])
 origins = [
     "http://127.0.0.1:5501",  # Si usas Live Server en VS Code
     "http://127.0.0.1:5500", 

@@ -488,7 +488,7 @@ def current_files(
 
 
 @router.get("/archivos_modificados", response_model=ListaArchivosResponse)
-def current_files(
+def archivos_modificados(
     limit: int = 20, 
     fechaDesde: Optional[str] = None, 
     fechaHasta: Optional[str] = None, 
@@ -523,7 +523,7 @@ def current_files(
 
 
 @router.get("/archivos_originales", response_model=ListaArchivosResponse)
-def current_files(
+def archivos_originales(
     limit: int = 20, 
     fechaDesde: Optional[str] = None, 
     fechaHasta: Optional[str] = None, 
